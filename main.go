@@ -5,17 +5,8 @@ import (
 	"os"
 )
 
-var words int
-var lines int
-var spaces int
-var punc int
-var character int
-var senten int
-var vowels int
-var consonance int
-
 func wordCounter(filedata string) {
-	words = 0
+	words := 0
 
 	for i := 0; i < len(filedata); i++ {
 
@@ -27,7 +18,7 @@ func wordCounter(filedata string) {
 }
 
 func lineCounter(filedata string) {
-	lines = 1
+	lines := 1
 	for i := 0; i < len(filedata); i++ {
 		if filedata[i] == '\n' {
 			lines++
@@ -37,7 +28,7 @@ func lineCounter(filedata string) {
 }
 
 func spaceCounter(filedata string) {
-	spaces = 0
+	spaces := 0
 	for i := 0; i < len(filedata); i++ {
 		if filedata[i] == ' ' {
 			spaces++
@@ -47,7 +38,7 @@ func spaceCounter(filedata string) {
 }
 
 func puncCounter(filedata string) {
-	punc = 0
+	punc := 0
 	for i := 0; i < len(filedata); i++ {
 		if filedata[i] == ',' || filedata[i] == '.' {
 			punc++
@@ -57,7 +48,7 @@ func puncCounter(filedata string) {
 }
 
 func speciCounter(filedata string) {
-	character = 0
+	character := 0
 	for i := 0; i < len(filedata); i++ {
 		if filedata[i] == '@' || filedata[i] == '$' || filedata[i] == '#' || filedata[i] == '%' || filedata[i] == '!' {
 			character++
@@ -66,7 +57,7 @@ func speciCounter(filedata string) {
 	fmt.Println("Numbers of special characters :", character)
 }
 func sentenceCounter(filedata string) {
-	senten = 0
+	senten := 0
 	for i := 0; i < len(filedata); i++ {
 		if filedata[i] == '.' {
 			senten++
@@ -76,7 +67,7 @@ func sentenceCounter(filedata string) {
 }
 
 func vowelCounter(filedata string) {
-	vowels = 0
+	vowels := 0
 	for i := 0; i < len(filedata); i++ {
 		if filedata[i] == 'a' || filedata[i] == 'e' || filedata[i] == 'i' || filedata[i] == 'o' || filedata[i] == 'u' {
 			vowels++
@@ -87,7 +78,7 @@ func vowelCounter(filedata string) {
 
 func consonCounnter(filedata string) {
 
-	consonance = 0
+	consonance := 0
 	for i := 0; i < len(filedata); i++ {
 		switch filedata[i] {
 		case 'b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'y', 'z',
