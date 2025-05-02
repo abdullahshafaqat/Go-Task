@@ -20,7 +20,7 @@ import (
 			}
 
 		
-	func lineCounter(filedata string) {
+	        func lineCounter(filedata string) {
 				lines := 1
 				for i := 0; i < len(filedata); i++ {
 					if filedata[i] == '\n' {
