@@ -98,7 +98,7 @@ import (
 
 
 		func paraCounter(filedata string){
-					var para = 1
+				        para := 1
 					for i := 0; i < len(filedata); i++ {
 						if filedata[i] == '\n' {
 							if i+1 < len(filedata) && filedata[i+1] == '\n' {
