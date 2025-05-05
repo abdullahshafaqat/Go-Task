@@ -6,145 +6,94 @@ import (
 	"time"
 )
 
+type TextState struct {
+	Name  string
+	Value int
+}
 
-		func wordCounter(filedata string){
-				words := 0
+func AnalyzeText(filedata string, resultchann chan<- TextState) {
+	go func() {
+		para := 1
+		words := 0
+		spaces := 0
+		lines := 1
+		senten := 0
+		punc := 0
+		character := 0
+		digit := 0
+		vowels := 0
+		consonants := 0
 
-				for i := 0; i < len(filedata); i++ {
-
-					if filedata[i] == ' ' {
-						words++
-					}
+		for i := 0; i < len(filedata); i++ {
+			ch := filedata[i]
+			switch ch {
+			case '\n':
+				lines++
+				if i+1 < len(filedata) && filedata[i+1] == '\n' {
+					para++
 				}
-				fmt.Println("Number of words :", words)
+			case ' ':
+				words++
+				spaces++
+			case '.':
+				punc++
+				if i+1 < len(filedata) && filedata[i+1] == ' ' {
+					senten++
+				}
+
+			case ',', ';', '"', '/', ':', '\\', '?', '`':
+				punc++
+			case '@', '$', '#', '%', '!':
+				character++
+			case 'a', 'e', 'i', 'o', 'u':
+				vowels++
+			case '1', '2', '3', '4', '5', '6', '7', '8', '9', '0':
+				{
+					digit++
+				}
+			case 'B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M',
+				'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z', 'b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'y', 'z':
+				{
+					consonants++
+				}
 			}
+		}
+
+		resultchann <- TextState{"Number of paragraphs", para}
+		resultchann <- TextState{"Number of words", words}
+		resultchann <- TextState{"Number of spaces", spaces}
+		resultchann <- TextState{"Number of lines", lines}
+		resultchann <- TextState{"Number of sentences", senten}
+		resultchann <- TextState{"Number of punctuations", punc}
+		resultchann <- TextState{"Number of special characters", character}
+		resultchann <- TextState{"Number of digits", digit}
+		resultchann <- TextState{"Number of vowels", vowels}
+		resultchann <- TextState{"Number of consonants", consonants}
+
+		close(resultchann)
+	}()
+}
+
+func main() {
+	start := time.Now()
+	defer func() {
+		fmt.Printf("Execution time: %s\n", time.Since(start))
+	}()
+
+	fmt.Println("Reading file")
+	filename := "Test.txt"
+	filedata, err := os.ReadFile(filename)
+	if err != nil {
+		panic(err)
+	}
+
+	resultchann := make(chan TextState, 10)
+	AnalyzeText(string(filedata), resultchann)
+
+
+	for res := range resultchann {
+		fmt.Printf("%s: %d\n", res.Name, res.Value)
+	}
 
 		
-	        func lineCounter(filedata string) {
-				lines := 1
-				for i := 0; i < len(filedata); i++ {
-					if filedata[i] == '\n' {
-						lines++
-					}
-				}
-				fmt.Println("Numbers of lines", lines)
-			}
-
-		func spaceCounter(filedata string) {
-				spaces := 0
-				for i := 0; i < len(filedata); i++ {
-					if filedata[i] == ' ' {
-						spaces++
-					}
-				}
-				fmt.Println("Numbers of spaces :", spaces)
-			}
-
-		func puncCounter(filedata string) {
-				punc := 0
-				for i := 0; i < len(filedata); i++ {
-					if filedata[i] == ',' || filedata[i] == '.' {
-						punc++
-					}
-				}
-				fmt.Println("Numbers of punctuations", punc)
-			}
-
-		func speciCounter(filedata string) {
-				character := 0
-				for i := 0; i < len(filedata); i++ {
-					if filedata[i] == '@' || filedata[i] == '$' || filedata[i] == '#' || filedata[i] == '%' || filedata[i] == '!' {
-						character++
-					}
-				}
-				fmt.Println("Numbers of special characters :", character)
-			}
-		func sentenceCounter(filedata string) {
-				senten := 0
-				for i := 0; i < len(filedata); i++ {
-					if filedata[i] == '.' {
-						if i+1 < len(filedata) && filedata[i+1] == ' ' {
-							senten++
-						}
-					}
-				}
-				fmt.Println("Numbers of sentences :", senten)
-			}
-
-		func vowelCounter(filedata string) {
-				vowels := 0
-				for i := 0; i < len(filedata); i++ {
-					if filedata[i] == 'a' || filedata[i] == 'e' || filedata[i] == 'i' || filedata[i] == 'o' || filedata[i] == 'u' {
-						vowels++
-					}
-				}
-				fmt.Println("Numbers of vowels :", vowels)
-			}
-
-		func consonCounnter(filedata string) {
-
-				consonants := 0
-				for i := 0; i < len(filedata); i++ {
-					switch filedata[i] {
-					case 'b', 'c', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'm', 'n', 'p', 'q', 'r', 's', 't', 'v', 'w', 'x', 'y', 'z',
-						'B', 'C', 'D', 'F', 'G', 'H', 'J', 'K', 'L', 'M', 'N', 'P', 'Q', 'R', 'S', 'T', 'V', 'W', 'X', 'Y', 'Z':
-						{
-							consonants++
-						}
-					}
-				}
-				fmt.Println("Numbers of consonants :", consonants)
-			}
-
-
-		func paraCounter(filedata string){
-				        para := 1
-					for i := 0; i < len(filedata); i++ {
-						if filedata[i] == '\n' {
-							if i+1 < len(filedata) && filedata[i+1] == '\n' {
-								para++
-							}
-						}
-					}
-					fmt.Println("Numbers of Paragraphs:", para)
-				
-			}
-
-
-		func digitCounter(filedata string) {
-					digit := 0
-					for i := 0; i < len(filedata); i++ {
-						if filedata[i] >= '0' && filedata[i] <= '9' {
-							digit++
-						}
-					}
-					fmt.Println("Numbers of digits :", digit)
-			}
-
-
-
-		func main() {
-
-					start := time.Now()
-					defer func() {
-						fmt.Printf("Execution time: %s\n", time.Since(start))
-					}()
-					fmt.Println("Reading file")
-					filename := "Test.txt"
-					filedata, err := os.ReadFile(filename)
-					if err != nil {
-						panic(err)
-					}
-					Str := string(filedata)
-					wordCounter(Str)
-					lineCounter(Str)
-					spaceCounter(Str)
-					puncCounter(Str)
-					speciCounter(Str)
-					sentenceCounter(Str)
-					vowelCounter(Str)
-					consonCounnter(Str)
-					digitCounter(Str)
-					paraCounter(Str)
-
-			}
+}
