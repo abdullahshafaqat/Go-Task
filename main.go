@@ -67,8 +67,7 @@ func main() {
 		timeTaken3 := time.Since(timeStart3)
 		c.JSON(200, gin.H{
 			"Filename":                           file.Filename,
-			"Time Taken for chunks":              timeTaken3.String(),
-			"Result":                             result,
+			"Chunks Result":                             result,
 			"Using combine function Words":       value[0],
 			"Using combine function Lines":       value[1],
 			"Using combine function Spaces":      value[2],
@@ -79,7 +78,8 @@ func main() {
 			"Using combine function Consonants":  value[7],
 			"Using combine function Digits":      value[8],
 			"Using combine function Paragraphs":  value[9],
-			"time taken for combine function":    timeTaken.String(),
+			"Time taken for combine function":    timeTaken.String(),
+			"Time Taken for chunks":              timeTaken3.String(),
 		})
 
 	})
