@@ -10,9 +10,11 @@ func main() {
 
 	db := database.Database()
 	defer db.Close()
-	router := gin.Default()
+	// router := gin.Default()
 
-	router.POST("/analyzer", handlers.AnalyzeText(db))
+	// router.POST("/analyzer", handlers.AnalyzeText(db))
 
-	router.Run(":8080")
+	signuproute := gin.Default()
+	signuproute.POST("/signup", handlers.SignUp(db))
+	signuproute.Run(":8080")
 }
