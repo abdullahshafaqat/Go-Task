@@ -3,8 +3,10 @@ package handlers
 import (
 	"net/http"
 
+	"github.com/abdullahshafaqat/GOTASKS/services"
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var login struct {
@@ -21,17 +23,26 @@ func LogIn(db *sqlx.DB) gin.HandlerFunc {
 		}
 		var user Info
 
-		err := db.Get(&user, `SELECT username,email,password
-			FROM users
-			 WHERE email = $1 AND  password = $2`,
-			login.Email, login.Password)
-
+		err := db.Get(&user, `SELECT username, email, password FROM users WHERE email = $1`, login.Email)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
 			return
 		}
+
+		if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(login.Password)); err != nil {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
+			return
+		}
+
+		token, err := services.CreateToken(user.Email)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not generate token"})
+			return
+		}
+
 		c.JSON(http.StatusOK, gin.H{
-			"message": "Login successfully",
+			"message": "Login successful",
+			"token":   token,
 		})
 	}
 }

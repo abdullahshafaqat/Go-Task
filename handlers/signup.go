@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type Info struct {
@@ -13,7 +14,7 @@ type Info struct {
 	Password string `json:"password"`
 }
 
-func SignUp(db *sqlx.DB ) gin.HandlerFunc {
+func SignUp(db *sqlx.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var user Info
 
@@ -22,7 +23,12 @@ func SignUp(db *sqlx.DB ) gin.HandlerFunc {
 			return
 		}
 		var exists bool
-		err := db.QueryRow(
+		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hashed password"})
+			return
+		}
+		err = db.QueryRow(
 			`SELECT EXISTS(SELECT 1 FROM users WHERE username = $1 OR email = $2)`,
 			user.Username, user.Email,
 		).Scan(&exists)
@@ -38,7 +44,7 @@ func SignUp(db *sqlx.DB ) gin.HandlerFunc {
 		}
 		_, err = db.Exec(
 			`INSERT INTO users (username, email, password) VALUES ($1, $2, $3)`,
-			user.Username, user.Email, user.Password,
+			user.Username, user.Email, string(hashedPassword),
 		)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
