@@ -10,8 +10,6 @@ import (
 
 func Authorization(db *sqlx.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-
-		c.Header("Content-Type", "application/json")
 		tokenString := c.GetHeader("Authorization")
 		if tokenString == "" {
 			c.AbortWithStatus(http.StatusUnauthorized)
