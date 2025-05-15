@@ -8,26 +8,35 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtKey = []byte(os.Getenv("JWT_SECRET"))
+var accessKey = []byte(os.Getenv("AC_SECRET"))
+var refreshKey = []byte(os.Getenv("RF_SECRET"))
 
-func CreateToken(email string) (string, error) {
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
-		jwt.MapClaims{
-			"email": email,
-			"exp":   time.Now().Add(time.Hour * 24).Unix(),
-		})
+func GenerateTokens(email string) (string, string, error) {
+	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"email": email,
+		"exp":   time.Now().Add(time.Minute * 15).Unix(),
+	})
 
-	tokenString, err := token.SignedString(jwtKey)
+	accessTokenString, err := accessToken.SignedString(accessKey)
 	if err != nil {
-		return "", err
+		return "", "", err
+	}
+	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"email": email,
+		"exp":   time.Now().Add(time.Hour * 24 * 7).Unix(),
+	})
+
+	refreshTokenString, err := refreshToken.SignedString(refreshKey)
+	if err != nil {
+		return "", "", err
 	}
 
-	return tokenString, nil
+	return accessTokenString, refreshTokenString, nil
 }
 
 func VerifyToken(tokenString string) error {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-		return jwtKey, nil
+		return accessKey, nil
 	})
 
 	if err != nil {
@@ -39,4 +48,25 @@ func VerifyToken(tokenString string) error {
 	}
 
 	return nil
+}
+func VerifyRefreshToken(tokenString string) (string, error) {
+	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+		return refreshKey, nil
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	if !token.Valid {
+		return "", fmt.Errorf("invalid refresh token")
+	}
+
+	claims, ok := token.Claims.(jwt.MapClaims)
+	if !ok || claims["email"] == nil {
+		return "", fmt.Errorf("invalid claims in token")
+	}
+
+	email := claims["email"].(string)
+	return email, nil
 }

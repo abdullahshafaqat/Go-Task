@@ -34,15 +34,15 @@ func LogIn(db *sqlx.DB) gin.HandlerFunc {
 			return
 		}
 
-		token, err := services.CreateToken(user.Email)
+		access, refresh,err := services.GenerateTokens(user.Email)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not generate token"})
 			return
 		}
 
 		c.JSON(http.StatusOK, gin.H{
-			"message": "Login successful",
-			"token":   token,
+			"access_token":   access,
+			"refresh_token":   refresh,
 		})
 	}
 }

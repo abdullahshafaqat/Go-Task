@@ -18,6 +18,7 @@ func main() {
 	router.POST("/login", handlers.LogIn(db))
 
 	router.POST("/auth", handlers.Authorization(db))
-	
+
+	router.POST("/refresh", handlers.RefreshToken)
 	router.Run(":8080")
 }
