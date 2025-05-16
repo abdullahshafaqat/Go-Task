@@ -14,7 +14,8 @@ var refreshKey = []byte(os.Getenv("RF_SECRET"))
 func GenerateTokens(email string) (string, string, error) {
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email": email,
-		"exp":   time.Now().Add(time.Minute * 15).Unix(),
+		"type":  "access",
+		"exp":   time.Now().Add(time.Second * 30).Unix(),
 	})
 
 	accessTokenString, err := accessToken.SignedString(accessKey)
@@ -23,6 +24,7 @@ func GenerateTokens(email string) (string, string, error) {
 	}
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email": email,
+		"type":  "refresh",
 		"exp":   time.Now().Add(time.Hour * 24 * 7).Unix(),
 	})
 
