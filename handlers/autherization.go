@@ -16,11 +16,11 @@ var refreshKey = []byte(os.Getenv("RF_SECRET"))
 
 func Authorization(db *sqlx.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
-			tokenString := c.GetHeader("Authorization")
-			if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer ") {
-				c.String(http.StatusUnauthorized, "Missing authorization header")
-				return
-			}
+		tokenString := c.GetHeader("Authorization")
+		if tokenString == "" || !strings.HasPrefix(tokenString, "Bearer ") {
+			c.String(http.StatusUnauthorized, "Missing authorization header")
+			return
+		}
 
 		tokenString = strings.TrimPrefix(tokenString, "Bearer ")
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
@@ -42,6 +42,13 @@ func Authorization(db *sqlx.DB) gin.HandlerFunc {
 			if claims, ok := token.Claims.(jwt.MapClaims); ok && claims["type"] == "refresh" {
 				c.String(http.StatusOK, "This is a refresh token")
 				return
+			}
+		}
+
+		if err != nil {
+			if strings.Contains(err.Error(), "expired") {
+				c.String(http.StatusUnauthorized, "Token is expired")
+			return
 			}
 		}
 

@@ -30,7 +30,7 @@ func SignUp(db *sqlx.DB) gin.HandlerFunc {
 		}
 
 		if !isValidGmail(user.Email) {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Enter a valid Gmail address"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Enter a valid Email address"})
 			return
 		}
 		var exists bool

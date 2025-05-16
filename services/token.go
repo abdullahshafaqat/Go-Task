@@ -15,7 +15,7 @@ func GenerateTokens(email string) (string, string, error) {
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"email": email,
 		"type":  "access",
-		"exp":   time.Now().Add(time.Minute * 1).Unix(),
+		"exp":   time.Now().Add(time.Second * 30).Unix(),
 	})
 
 	accessTokenString, err := accessToken.SignedString(accessKey)
@@ -46,7 +46,7 @@ func VerifyToken(tokenString string) error {
 	}
 
 	if !token.Valid {
-		return fmt.Errorf("token expired")
+		return fmt.Errorf("invalid token")
 	}
 
 	return nil
@@ -60,7 +60,7 @@ func VerifyRefreshToken(tokenString string) (string, error) {
 		return "", err
 	}
 
-	if !token.Valid{
+	if !token.Valid {
 		return "", fmt.Errorf("invalid refresh token")
 	}
 
