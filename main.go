@@ -11,7 +11,7 @@ func main() {
 	db := database.Database()
 	defer db.Close()
 	router := gin.Default()
-	router.POST("/analyzer", handlers.AnalyzeText(db))
+	router.POST("/analyzer", handlers.Authorization(db),handlers.AnalyzeText(db))
 
 	router.POST("/signup", handlers.SignUp(db))
 

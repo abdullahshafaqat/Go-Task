@@ -34,34 +34,20 @@ func SignUp(db *sqlx.DB) gin.HandlerFunc {
 			return
 		}
 		var exists bool
-		err := db.QueryRow(
+		_ = db.QueryRow(
 			`SELECT EXISTS(SELECT 1 FROM users WHERE username = $1 OR email = $2)`,
 			user.Username, user.Email,
 		).Scan(&exists)
-
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Database check error"})
-			return
-		}
-
 		if exists {
 			c.JSON(http.StatusConflict, gin.H{"error": "Username or email already exists"})
 			return
 		}
-		hashedPassword, err := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Password hashing failed"})
-			return
-		}
-
-		_, err = db.Exec(
+		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+		
+		_, _ = db.Exec(
 			`INSERT INTO users (username, email, password) VALUES ($1, $2, $3)`,
 			user.Username, user.Email, string(hashedPassword),
 		)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "User creation failed"})
-			return
-		}
 
 		c.JSON(http.StatusCreated, gin.H{
 			"message": "User created successfully",
