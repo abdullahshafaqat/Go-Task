@@ -16,10 +16,10 @@ func RefreshToken(c *gin.Context) {
 
 	email, err := services.VerifyRefreshToken(refreshToken)
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid or expired refresh token"})
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid refresh token"})
 		return
 	}
-	newAccessToken, _, err := services.GenerateTokens(email)
+	newAccessToken,_,err := services.GenerateTokens(email)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not generate new token"})
 		return

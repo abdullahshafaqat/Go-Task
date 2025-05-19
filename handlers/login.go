@@ -18,7 +18,7 @@ func LogIn(db *sqlx.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		if err := c.ShouldBindJSON(&login); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "Data not in json"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
 			return
 		}
 		var user Info
@@ -34,12 +34,7 @@ func LogIn(db *sqlx.DB) gin.HandlerFunc {
 			return
 		}
 
-		access, refresh,err := services.GenerateTokens(user.Email)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not generate token"})
-			return
-		}
-
+		access, refresh, _ := services.GenerateTokens(user.Email)
 		c.JSON(http.StatusOK, gin.H{
 			"access_token":   access,
 			"refresh_token":   refresh,
