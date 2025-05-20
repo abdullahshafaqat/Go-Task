@@ -45,7 +45,6 @@ func Authorization(db *sqlx.DB) gin.HandlerFunc {
 		}
 		if token, err := parseToken(tokenString, accessKey); err == nil {
 			if TokenType(token, "access") {
-				
 				c.Next()
 				return
 			}
