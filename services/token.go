@@ -11,21 +11,20 @@ import (
 var accessKey = []byte(os.Getenv("AC_SECRET"))
 var refreshKey = []byte(os.Getenv("RF_SECRET"))
 
-func GenerateTokens(email string) (string, string, error) {
+func GenerateTokens(ID string) (string, string, error) {
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"email": email,
-		"type":  "access",
-		"exp":   time.Now().Add(time.Minute * 15).Unix(),
+		"ID":   ID,
+		"type": "access",
+		"exp":  time.Now().Add(time.Minute * 15).Unix(),
 	})
-
 	accessTokenString, err := accessToken.SignedString(accessKey)
 	if err != nil {
 		return "", "", err
 	}
 	refreshToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"email": email,
-		"type":  "refresh",
-		"exp":   time.Now().Add(time.Hour * 24 * 7).Unix(),
+		"ID":   ID,
+		"type": "refresh",
+		"exp":  time.Now().Add(time.Hour * 24 * 7).Unix(),
 	})
 
 	refreshTokenString, err := refreshToken.SignedString(refreshKey)
@@ -65,10 +64,11 @@ func VerifyRefreshToken(tokenString string) (string, error) {
 	}
 
 	claims, ok := token.Claims.(jwt.MapClaims)
-	if !ok || claims["email"] == nil {
+	if !ok || claims["ID"] == nil {
 		return "", fmt.Errorf("invalid claims in token")
 	}
 
-	email := claims["email"].(string)
-	return email, nil
+	id := claims["ID"].(string)
+	return id, nil
+
 }

@@ -25,7 +25,7 @@ func AnalyzeText(db *sqlx.DB) gin.HandlerFunc {
 		fileData, _ := io.ReadAll(Data)
 		Str := string(fileData)
 		timeTaken := time.Since(startTime)
-		resultchann := make(chan []int)
+		resultchann := make(chan combine.ResultStruct)
 		go combine.AnalyzeText(Str, resultchann)
 		value := <-resultchann
 		_, err = db.Exec(`
@@ -34,16 +34,16 @@ func AnalyzeText(db *sqlx.DB) gin.HandlerFunc {
 				sentences, vowels, consonants, digits, paragraphs, combine_time
 			) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)`,
 			file.Filename,
-			value[0],
-			value[1],
-			value[2],
-			value[3],
-			value[4],
-			value[5],
-			value[6],
-			value[7],
-			value[8],
-			value[9],
+			value.Words,
+			value.Lines,
+			value.Spaces,
+			value.Punc,
+			value.Characters,
+			value.Sentences,
+			value.Vowels,
+			value.Consonants,
+			value.Digits,
+			value.Para,
 			timeTaken.String(),
 		)
 		if err != nil {
@@ -53,16 +53,16 @@ func AnalyzeText(db *sqlx.DB) gin.HandlerFunc {
 
 		c.JSON(http.StatusOK, gin.H{
 			"Filename":       file.Filename,
-			"Words":          value[0],
-			"Lines":          value[1],
-			"Spaces":         value[2],
-			"Punctuation":    value[3],
-			"Characters":     value[4],
-			"Sentences":      value[5],
-			"Vowels":         value[6],
-			"Consonants":     value[7],
-			"Digits":         value[8],
-			"Paragraphs":     value[9],
+			"Words":          value.Words,
+			"Lines":          value.Lines,
+			"Spaces":         value.Spaces,
+			"Punctuation":    value.Punc,
+			"Characters":     value.Characters,
+			"Sentences":      value.Sentences,
+			"Vowels":         value.Vowels,
+			"Consonants":     value.Consonants,
+			"Digits":         value.Digits,
+			"Paragraphs":     value.Para,
 			"Execution time": timeTaken.String(),
 		})
 	}

@@ -1,6 +1,20 @@
 package combine
 
-func AnalyzeText(fileData string, resultchann chan<- []int) {
+type ResultStruct struct {
+	Para       int
+	Words      int
+	Spaces     int
+	Lines      int
+	Sentences  int
+	Punc       int
+	Characters int
+	Digits     int
+	Vowels     int
+	Consonants int
+}
+
+
+func AnalyzeText(fileData string, resultchann chan <- ResultStruct) {
 	para := 1
 	words := 0
 	spaces := 0
@@ -56,8 +70,21 @@ func AnalyzeText(fileData string, resultchann chan<- []int) {
 			}
 		}
 	}
-	result := []int{words,lines,spaces,punc,character,senten,vowels,consonants,digit,para}
-	resultchann <- result
 	
+
+	result := ResultStruct{
+	Para:       para,
+	Words:      words,
+	Spaces:     spaces,
+	Lines:      lines,
+	Sentences:  senten,  
+	Punc:       punc,
+	Characters: character,
+	Digits:     digit,   
+	Vowels:     vowels,
+	Consonants: consonants,
+}
+	resultchann <- result
+
 	close(resultchann)
 }

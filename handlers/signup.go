@@ -10,6 +10,7 @@ import (
 )
 
 type Info struct {
+	ID       string `json:"id"`
 	Username string `json:"username"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
@@ -33,21 +34,15 @@ func SignUp(db *sqlx.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Enter a valid Email address"})
 			return
 		}
-		var exists bool
 		_ = db.QueryRow(
 			`SELECT EXISTS(SELECT 1 FROM users WHERE username = $1 OR email = $2)`,
 			user.Username, user.Email,
-		).Scan(&exists)
-		if exists {
-			c.JSON(http.StatusConflict, gin.H{"error": "Username or email already exists"})
-			return
-		}
-		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
-		
-		_, _ = db.Exec(
-			`INSERT INTO users (username, email, password) VALUES ($1, $2, $3)`,
-			user.Username, user.Email, string(hashedPassword),
 		)
+		hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), bcrypt.DefaultCost)
+		_ = db.QueryRow(
+			`INSERT INTO users (username, email, password) VALUES ($1, $2, $3) RETURNING id`,
+			user.Username, user.Email, string(hashedPassword),
+		).Scan(&user.ID)
 
 		c.JSON(http.StatusCreated, gin.H{
 			"message": "User created successfully",

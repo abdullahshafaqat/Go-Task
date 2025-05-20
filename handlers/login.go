@@ -22,22 +22,21 @@ func LogIn(db *sqlx.DB) gin.HandlerFunc {
 			return
 		}
 		var user Info
-
-		err := db.Get(&user, `SELECT username, email, password FROM users WHERE email = $1`, login.Email)
+		err := db.Get(&user, `SELECT id, username, email, password FROM users WHERE email = $1`, login.Email)
 		if err != nil {
 			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
 			return
 		}
 
 		if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(login.Password)); err != nil {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid password"})
 			return
 		}
 
-		access, refresh, _ := services.GenerateTokens(user.Email)
+		access, refresh, _ := services.GenerateTokens(user.ID)
 		c.JSON(http.StatusOK, gin.H{
-			"access_token":   access,
-			"refresh_token":   refresh,
+			"access_token":  access,
+			"refresh_token": refresh,
 		})
 	}
 }
