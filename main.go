@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/abdullahshafaqat/GOTASKS/database"
+	"github.com/abdullahshafaqat/GOTASKS/api/Database"
 	"github.com/abdullahshafaqat/GOTASKS/routes"
 	"github.com/gin-gonic/gin"
 )
