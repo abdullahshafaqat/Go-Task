@@ -1,21 +1,30 @@
 package services
 
 import (
-	"io"
-	"mime/multipart"
+	"time"
+
+	"github.com/abdullahshafaqat/GOTASKS/combine"
+	"github.com/abdullahshafaqat/GOTASKS/models"
 )
 
-func UploadedFile(fileHeader *multipart.FileHeader) ([]byte, error) {
-	Data, err := fileHeader.Open()
-	if err != nil {
-		return nil, err
+func TextAnalysis(Str string) (models.Results, time.Duration) {
+	startTime := time.Now()
+	resultchann := make(chan combine.ResultStruct)
+	go combine.AnalyzeText(Str, resultchann)
+	value := <-resultchann
+	timeTaken := time.Since(startTime)
+	result := models.Results{
+		Words:      value.Words,
+		Lines:      value.Lines,
+		Spaces:     value.Spaces,
+		Punc:       value.Punc,
+		Characters: value.Characters,
+		Sentences:  value.Sentences,
+		Vowels:     value.Vowels,
+		Consonants: value.Consonants,
+		Digits:     value.Digits,
+		Para:       value.Para,
 	}
-	defer Data.Close()
 
-	fileData, err := io.ReadAll(Data)
-	if err != nil {
-		return nil, err
-	}
-
-	return fileData, nil
+	return result, timeTaken
 }

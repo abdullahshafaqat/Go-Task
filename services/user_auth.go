@@ -34,7 +34,7 @@ func LoginUser(db *sqlx.DB, entry models.LoginUser) (string, string, error) {
 	if err := bcrypt.CompareHashAndPassword([]byte(info.Password), []byte(entry.Password)); err != nil {
 		return "", "", errors.New("invalid password")
 	}
-	access, refresh, err:= GenerateTokens(info.ID)
+	access, refresh, err := GenerateTokens(info.ID)
 	if err != nil {
 		return "", "", errors.New("failed to generate tokens")
 	}

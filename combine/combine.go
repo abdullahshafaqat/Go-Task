@@ -13,8 +13,7 @@ type ResultStruct struct {
 	Consonants int
 }
 
-
-func AnalyzeText(fileData string, resultchann chan <- ResultStruct) {
+func AnalyzeText(fileData string, resultchann chan<- ResultStruct) {
 	para := 1
 	words := 0
 	spaces := 0
@@ -70,20 +69,19 @@ func AnalyzeText(fileData string, resultchann chan <- ResultStruct) {
 			}
 		}
 	}
-	
 
 	result := ResultStruct{
-	Para:       para,
-	Words:      words,
-	Spaces:     spaces,
-	Lines:      lines,
-	Sentences:  senten,  
-	Punc:       punc,
-	Characters: character,
-	Digits:     digit,   
-	Vowels:     vowels,
-	Consonants: consonants,
-}
+		Para:       para,
+		Words:      words,
+		Spaces:     spaces,
+		Lines:      lines,
+		Sentences:  senten,
+		Punc:       punc,
+		Characters: character,
+		Digits:     digit,
+		Vowels:     vowels,
+		Consonants: consonants,
+	}
 	resultchann <- result
 
 	close(resultchann)
