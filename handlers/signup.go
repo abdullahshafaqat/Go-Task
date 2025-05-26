@@ -3,13 +3,24 @@ package handlers
 import (
 	"net/http"
 
+	signup "github.com/abdullahshafaqat/GOTASKS/handlers/signup_interface"
 	"github.com/abdullahshafaqat/GOTASKS/models"
 	"github.com/abdullahshafaqat/GOTASKS/services"
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
 )
 
-func SignUp(db *sqlx.DB) gin.HandlerFunc {
+type UserHandler struct {
+	services signup.UserSignupService
+}
+
+func NewUserHandler() signup.UserSignupHandler {
+	return &UserHandler{
+		services: services.NewUserService(),
+	}
+}
+
+func (h *UserHandler) SignUp(db *sqlx.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		var User models.NewUser
 
@@ -17,7 +28,7 @@ func SignUp(db *sqlx.DB) gin.HandlerFunc {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
-		err := services.RegisterUser(db, User)
+		err := h.services.RegisterUser(db, User)
 		if err != nil {
 			c.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 			return
@@ -28,3 +39,5 @@ func SignUp(db *sqlx.DB) gin.HandlerFunc {
 		})
 	}
 }
+
+var _ signup.UserSignupHandler = &UserHandler{}
