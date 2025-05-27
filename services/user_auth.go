@@ -5,25 +5,35 @@ import (
 	"regexp"
 
 	repo "github.com/abdullahshafaqat/GOTASKS/api/repository"
+	signup "github.com/abdullahshafaqat/GOTASKS/handlers/signup_interface"
 	"github.com/abdullahshafaqat/GOTASKS/models"
 	"github.com/jmoiron/sqlx"
 	"golang.org/x/crypto/bcrypt"
 )
 
-func isValidGmail(email string) bool {
-	valid := regexp.MustCompile(`^[^@]+@gmail\.com$`)
-	return valid.MatchString(email)
+type userService struct {
+	repo signup.UserSignupRepo
 }
 
-func RegisterUser(db *sqlx.DB, User models.NewUser) error {
-	if !isValidGmail(User.Email) {
+func NewUserService() signup.UserSignupService {
+	return &userService{
+		repo: repo.NewUser(),
+	}
+}
+
+func (s *userService) RegisterUser(db *sqlx.DB, user models.NewUser) error {
+	if !s.isValidGmail(user.Email) {
 		return errors.New("invalid email")
 	}
-	exists, err := repo.GetUser(db, User.Username, User.Email)
+	exists, err := s.repo.GetUser(db, user.Username, user.Email)
 	if err == nil && exists {
 		return errors.New("user already exists")
 	}
-	return repo.CreateUser(db, User)
+	return s.repo.CreateUser(db, user)
+}
+func (s *userService) isValidGmail(email string) bool {
+	valid := regexp.MustCompile(`^[^@]+@gmail\.com$`)
+	return valid.MatchString(email)
 }
 
 func LoginUser(db *sqlx.DB, entry models.LoginUser) (string, string, error) {
@@ -40,3 +50,5 @@ func LoginUser(db *sqlx.DB, entry models.LoginUser) (string, string, error) {
 	}
 	return access, refresh, err
 }
+
+var _ signup.UserSignupService = &userService{}
