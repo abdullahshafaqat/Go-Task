@@ -7,9 +7,10 @@ import (
 )
 
 func DefineRoutes(router *gin.Engine, db *sqlx.DB) {
-	router.POST("/analyzer", handlers.Authorization(db), handlers.UploadText(db))
-	router.POST("/signup", (handlers.NewUserHandler().SignUp(db)))
-	router.POST("/login", handlers.LogIn(db))
-	router.POST("/auth", handlers.Authorization(db))
-	router.POST("/refresh", handlers.RefreshToken)
+	handler := handlers.NewUserHandler(db)
+	router.POST("/analyzer", handler.Authorization(), handlers.UploadText(db))
+	router.POST("/signup", handler.SignUp())
+	router.POST("/login", handler.LogIn())
+	router.POST("/auth", handler.Authorization())
+	router.POST("/refresh", handler.RefreshToken())
 }

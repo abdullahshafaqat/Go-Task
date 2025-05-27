@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	repo "github.com/abdullahshafaqat/GOTASKS/api/repository"
-	"github.com/abdullahshafaqat/GOTASKS/services"
+	"github.com/abdullahshafaqat/GOTASKS/middlewares"
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
 )
@@ -23,7 +23,7 @@ func UploadText(db *sqlx.DB) gin.HandlerFunc {
 		fileData, _ := io.ReadAll(data)
 		text := string(fileData)
 
-		result, timeTaken := services.TextAnalysis(text)
+		result, timeTaken := middlewares.TextAnalysis(text)
 
 		err = repo.Result(db, file.Filename, result, timeTaken.String())
 		if err != nil {
