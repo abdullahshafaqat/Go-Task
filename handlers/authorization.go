@@ -7,7 +7,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/jmoiron/sqlx"
 )
 
 var accessKey = []byte(os.Getenv("AC_SECRET"))
@@ -35,7 +34,7 @@ func TokenType(token *jwt.Token, Type string) bool {
 	return false
 }
 
-func Authorization(db *sqlx.DB) gin.HandlerFunc {
+func (h *userHandler) Authorization() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString := BearerToken(c.GetHeader("Authorization"))
 		if tokenString == "" {

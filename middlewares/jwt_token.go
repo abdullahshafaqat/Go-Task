@@ -1,4 +1,4 @@
-package services
+package middlewares
 
 import (
 	"fmt"
@@ -11,7 +11,7 @@ import (
 var accessKey = []byte(os.Getenv("AC_SECRET"))
 var refreshKey = []byte(os.Getenv("RF_SECRET"))
 
-func GenerateTokens(ID string) (string, string, error) {
+func(a *authMiddleware) GenerateTokens(ID string) (string, string, error) {
 	accessToken := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
 		"ID":   ID,
 		"type": "access",
@@ -35,7 +35,7 @@ func GenerateTokens(ID string) (string, string, error) {
 	return accessTokenString, refreshTokenString, nil
 }
 
-func VerifyToken(tokenString string) error {
+func (a *authMiddleware) VerifyToken(tokenString string) error {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return accessKey, nil
 	})
@@ -50,7 +50,7 @@ func VerifyToken(tokenString string) error {
 
 	return nil
 }
-func VerifyRefreshToken(tokenString string) (string, error) {
+func (a *authMiddleware) VerifyRefreshToken(tokenString string) (string, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return refreshKey, nil
 	})
